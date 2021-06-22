@@ -9,11 +9,11 @@ import java.util.*
 import javax.inject.Singleton
 
 @Singleton
-class ConsoleServiceImpl(private val cqlSession: CqlSession) : ConsoleRepository {
+class ConsoleRepositoryImpl(private val cqlSession: CqlSession) : ConsoleRepository {
 
     override fun save(console: Console): Console {
         console.id = UUID.randomUUID()
-        val id = cqlSession.execute(
+        cqlSession.execute(
             SimpleStatement
                 .newInstance(
                     "INSERT INTO console.console(id, nome, marca, data_lancamento, data_cadastro) VALUES (?,?,?,?,?)",
@@ -27,25 +27,25 @@ class ConsoleServiceImpl(private val cqlSession: CqlSession) : ConsoleRepository
         return console
     }
 
-    override fun findById(id: UUID): Optional<Console> {
+    override fun findById(id: UUID): Console? {
 
         val row: Row? = cqlSession.execute(
             SimpleStatement
                 .builder("SELECT * FROM console.console WHERE id = ?")
                 .addPositionalValue(id)
                 .build()
-        ).one() ?: return Optional.empty()
+        ).one() ?: return null
 
-        return Optional.of(Console(
+        return Console(
             nome = row?.getString("nome")!!,
             marca = row?.getString("marca")!!,
             dataLancamento = row?.getLocalDate("data_lancamento"),
             dataCadastro = row?.getLocalDate("data_cadastro")!!,
             id = row?.getUuid("id")
-        ))
+        )
     }
 
-    override fun findAll(): Collection<Console> {
+    override fun findAll(): List<Console> {
 
         val resultadoBusca: ResultSet = cqlSession.execute(
             SimpleStatement

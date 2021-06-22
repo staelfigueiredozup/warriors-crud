@@ -33,6 +33,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
     implementation("io.micronaut:micronaut-management")
     implementation("io.micronaut:micronaut-validation")
+    implementation("io.micronaut.nats:micronaut-nats")
 
     implementation ("com.datastax.oss:java-driver-core:4.11.0")
     implementation("io.micronaut.cassandra:micronaut-cassandra")

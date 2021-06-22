@@ -8,9 +8,9 @@ import javax.inject.Singleton
 interface ConsoleRepository {
 
     fun save (console: Console) : Console
-    fun findById (id: UUID) : Optional<Console>
+    fun findById (id: UUID) : Console?
     fun update (console: Console): Console
-    fun findAll(): Collection<Console>
+    fun findAll(): List<Console>
     fun delete(console: Console)
 
 }
