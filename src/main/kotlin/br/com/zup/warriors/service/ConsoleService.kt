@@ -8,7 +8,5 @@ import java.util.*
 interface ConsoleService {
     fun atualizaConsole(id: UUID, novosDados: DadosRequest): ConsoleResponse
     fun cadastraConsole(request: ConsoleRequest): ConsoleResponse
-    fun consultaConsole(id: UUID): ConsoleResponse
-    fun listaConsoles(): List<ConsoleResponse>
     fun deletaConsole(id: UUID)
 }

@@ -46,7 +46,6 @@ internal class ConsoleServiceImplTest: AnnotationSpec() {
     @Test
     fun `deve atualizar um console`(){
         //cenário
-        every { service.atualizaConsole(id, dadosRequest) } answers { consoleResponse }
         every { repository.findById(id) } answers { console }
         every { consoleUtils.atualiza(console, dadosRequest) } answers { consoleCompleto }
         every { repository.update(console) } answers { consoleCompleto }
@@ -62,7 +61,7 @@ internal class ConsoleServiceImplTest: AnnotationSpec() {
     }
 
     @Test
-    fun `deve lançar um erro quando tenta atualizar um console inexistente no banco de dados`(){
+    fun `deve lancar um erro quando tenta atualizar um console inexistente no banco de dados`(){
         //cenário
         every { repository.findById(id) } answers { null }
 
@@ -78,70 +77,19 @@ internal class ConsoleServiceImplTest: AnnotationSpec() {
     @Test
     fun `deve cadastrar um console`(){
         //cenário
-        every { service.cadastraConsole(consoleRequest) } answers { consoleResponse }
         every { repository.save( any() ) } answers { consoleCompleto }
 
         //ação
         val result = service.cadastraConsole(consoleRequest)
 
         //validação
-        result.nome shouldBe "nintendo"
-    }
-
-    @Test
-    fun `deve buscar um console pelo id`(){
-        //cenário
-        every { service.consultaConsole(id) } answers { consoleResponse }
-        every { repository.findById(id) } answers { consoleCompleto }
-
-        //ação
-        val result = service.consultaConsole(id)
-
-        //validação
         result.nome shouldBe consoleResponse.nome
         result.marca shouldBe consoleResponse.marca
-        result.dataLancamento shouldBe consoleResponse.dataLancamento.toString()
-    }
-
-    @Test
-    fun `deve lançar um erro quando tenta consultar um console inexistente no banco de dados`(){
-        //cenário
-        every { repository.findById(id) } answers { null }
-
-        //ação
-        val result = shouldThrow<ConsoleNaoEncontradoException> {
-            service.consultaConsole(id)
-        }
-
-        //validação
-        result.message shouldBe "Console inexistente no banco de dados"
-    }
-
-    @Test
-    fun `deve listar os consoles cadastrados`(){
-        //cenário
-        val console1 = ConsoleResponse(UUID.randomUUID(),"nome1", "marca1", null, LocalDate.now().toString())
-        val console2 = ConsoleResponse(UUID.randomUUID(),"nome2", "marca2", null, LocalDate.now().toString())
-        val console3 = ConsoleResponse(UUID.randomUUID(),"nome3", "marca3", null, LocalDate.now().toString())
-        val listaConsoles = listOf(console1, console2, console3)
-        every { service.listaConsoles() } answers { listaConsoles }
-        every { repository.findAll() } answers { listaConsoles.map { cr ->
-            Console(cr.nome, cr.marca, null, cr.id) } }
-
-        //ação
-        val result = service.listaConsoles()
-
-        //validação
-        result.size shouldBe 3
-        result.get(0).nome shouldBe "nome1"
-        result.get(1).nome shouldBe "nome2"
-        result.get(2).nome shouldBe "nome3"
     }
 
     @Test
     fun `deve deletar um console pelo id`(){
         //cenário
-        every { service.deletaConsole(id) } answers { Unit }
         every { repository.findById(id) } answers { consoleCompleto }
         every { repository.delete(consoleCompleto) } answers { Unit }
 
@@ -150,7 +98,6 @@ internal class ConsoleServiceImplTest: AnnotationSpec() {
 
         //validação
         result shouldBe Unit
-
     }
 
 }

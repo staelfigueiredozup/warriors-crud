@@ -1,8 +1,11 @@
 package br.com.zup.warriors.listener
 
+import br.com.zup.warriors.dto.ConsoleRequest
 import br.com.zup.warriors.dto.ConsoleResponse
 import br.com.zup.warriors.dto.DadosRequest
 import br.com.zup.warriors.dto.EventsInformation
+import br.com.zup.warriors.model.Console
+import br.com.zup.warriors.repository.ConsoleRepository
 import br.com.zup.warriors.service.ConsoleService
 import io.kotest.assertions.show.show
 import io.kotest.core.spec.style.AnnotationSpec
@@ -22,6 +25,7 @@ class ConsoleServerTest : AnnotationSpec() {
 
     lateinit var eventsInformation: EventsInformation
     lateinit var consoleResponse: ConsoleResponse
+    lateinit var consoleRequest: ConsoleRequest
 
     companion object {
         val id = UUID.randomUUID().toString()
@@ -36,6 +40,11 @@ class ConsoleServerTest : AnnotationSpec() {
             LocalDate.now().toString(),
             LocalDate.now().toString()
         )
+        consoleRequest = ConsoleRequest(
+            "consoleA",
+            "marcaA",
+            LocalDate.now(),
+        )
     }
 
     @Test
@@ -45,8 +54,7 @@ class ConsoleServerTest : AnnotationSpec() {
             event = "CADASTRA_CONSOLE", nome = "consoleA", marca = "marcaA", id = id,
             dataLancamento = LocalDate.now()
         )
-        every { consoleServer.recive(eventsInformation) } answers { Unit }
-        every { consoleService.cadastraConsole(any()) } answers { consoleResponse }
+        every { consoleService.cadastraConsole(consoleRequest) } answers { consoleResponse }
 
         //ação
         val result = consoleServer.recive(eventsInformation)
@@ -62,7 +70,6 @@ class ConsoleServerTest : AnnotationSpec() {
             event = "ATUALIZA_CONSOLE", nome = "consoleA", marca = "marcaA", id = id,
             dataLancamento = LocalDate.now()
         )
-        every { consoleServer.recive(eventsInformation) } answers { Unit }
         every { consoleService.atualizaConsole(any(), any()) } answers { consoleResponse }
 
         //ação
@@ -79,7 +86,6 @@ class ConsoleServerTest : AnnotationSpec() {
             event = "DELETA_CONSOLE", nome = "consoleA", marca = "marcaA", id = id,
             dataLancamento = LocalDate.now()
         )
-        every { consoleServer.recive(eventsInformation) } answers { Unit }
         every { consoleService.deletaConsole(any()) } answers { Unit }
 
         //ação
@@ -88,7 +94,4 @@ class ConsoleServerTest : AnnotationSpec() {
         //validação
         result shouldBe Unit
     }
-
-
-
 }

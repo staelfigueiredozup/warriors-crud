@@ -29,18 +29,6 @@ class ConsoleServiceImpl(private var repository: ConsoleRepository) : ConsoleSer
         return consoleCadastrado.toDto()
     }
 
-    override fun consultaConsole(id: UUID): ConsoleResponse {
-        val possivelConsole = repository.findById(id)
-            ?: throw ConsoleNaoEncontradoException("Console inexistente no banco de dados")
-        return possivelConsole.toDto()
-    }
-
-    override fun listaConsoles(): List<ConsoleResponse> {
-        return repository.findAll().map { console ->
-            console.toDto()
-        }
-    }
-
     override fun deletaConsole(id: UUID): Unit {
         val console = repository.findById(id) ?: return
         return repository.delete(console)
