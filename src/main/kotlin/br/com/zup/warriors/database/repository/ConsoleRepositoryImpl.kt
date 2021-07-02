@@ -1,6 +1,7 @@
-package br.com.zup.warriors.repository
+package br.com.zup.warriors.database.repository
 
-import br.com.zup.warriors.model.Console
+import br.com.zup.warriors.core.ports.ConsoleRepositoryPort
+import br.com.zup.warriors.database.entity.ConsoleEntity
 import com.datastax.oss.driver.api.core.CqlSession
 import com.datastax.oss.driver.api.core.cql.ResultSet
 import com.datastax.oss.driver.api.core.cql.Row
@@ -9,25 +10,25 @@ import java.util.*
 import javax.inject.Singleton
 
 @Singleton
-class ConsoleRepositoryImpl(private val cqlSession: CqlSession) : ConsoleRepository {
+class ConsoleRepositoryImpl(private val cqlSession: CqlSession) : ConsoleRepositoryPort {
 
-    override fun save(console: Console): Console {
-        console.id = UUID.randomUUID()
+    override fun save(consoleEntity: ConsoleEntity): ConsoleEntity {
+        consoleEntity.id = UUID.randomUUID()
         cqlSession.execute(
             SimpleStatement
                 .newInstance(
                     "INSERT INTO console.console(id, nome, marca, data_lancamento, data_cadastro) VALUES (?,?,?,?,?)",
-                    console.id,
-                    console.nome,
-                    console.marca,
-                    console.dataLancamento,
-                    console.dataCadastro
+                    consoleEntity.id,
+                    consoleEntity.nome,
+                    consoleEntity.marca,
+                    consoleEntity.dataLancamento,
+                    consoleEntity.dataCadastro
                 )
         )
-        return console
+        return consoleEntity
     }
 
-    override fun findById(id: UUID): Console? {
+    override fun findById(id: UUID): ConsoleEntity? {
 
         val row: Row? = cqlSession.execute(
             SimpleStatement
@@ -36,7 +37,7 @@ class ConsoleRepositoryImpl(private val cqlSession: CqlSession) : ConsoleReposit
                 .build()
         ).one() ?: return null
 
-        return Console(
+        return ConsoleEntity(
             nome = row?.getString("nome")!!,
             marca = row?.getString("marca")!!,
             dataLancamento = row?.getLocalDate("data_lancamento"),
@@ -45,50 +46,25 @@ class ConsoleRepositoryImpl(private val cqlSession: CqlSession) : ConsoleReposit
         )
     }
 
-    override fun findAll(): List<Console> {
-
-        val resultadoBusca: ResultSet = cqlSession.execute(
-            SimpleStatement
-                .builder("SELECT * FROM console.console")
-                .build()
-        )
-
-        var listaConsoles = resultadoBusca.map { row ->
-            Console(id = row.getUuid("id"),
-                nome = row?.getString("nome")!!,
-                marca = row?.getString("marca")!!,
-                dataLancamento = row?.getLocalDate("data_lancamento"),
-                dataCadastro = row?.getLocalDate("data_cadastro")!!,
-            )
-        }.toList()
-        return listaConsoles
-    }
-
-    override fun update(console: Console): Console {
+    override fun update(consoleEntity: ConsoleEntity): ConsoleEntity {
         cqlSession.execute(
             SimpleStatement
                 .builder("UPDATE console.console SET nome = ?, marca = ?, data_lancamento = ? WHERE id = ?")
-                .addPositionalValue(console.nome)
-                .addPositionalValue(console.marca)
-                .addPositionalValue(console.dataLancamento)
-                .addPositionalValue(console.id)
+                .addPositionalValue(consoleEntity.nome)
+                .addPositionalValue(consoleEntity.marca)
+                .addPositionalValue(consoleEntity.dataLancamento)
+                .addPositionalValue(consoleEntity.id)
                 .build()
         )
 
         var row = cqlSession.execute(
             SimpleStatement
                 .builder("SELECT * FROM console.console WHERE id = ?")
-                .addPositionalValue(console.id)
+                .addPositionalValue(consoleEntity.id)
                 .build()
         ).one()
 
-        /**
-         * Fiz esta busca no banco de dados para ter certeza de que os
-         * dados foram alterados na tabela, mas não sei se é certo fazer isso ou se
-         * é assim que se faz
-         */
-
-        return Console(
+        return ConsoleEntity(
             nome = row?.getString("nome")!!,
             marca = row?.getString("marca")!!,
             dataLancamento = row?.getLocalDate("data_lancamento"),
@@ -97,11 +73,11 @@ class ConsoleRepositoryImpl(private val cqlSession: CqlSession) : ConsoleReposit
         )
     }
 
-    override fun delete(console: Console) {
+    override fun delete(id: UUID) {
         cqlSession.execute(
             SimpleStatement
                 .builder("DELETE FROM console.console WHERE id = ?")
-                .addPositionalValue(console.id)
+                .addPositionalValue(id)
                 .build()
         )
     }
