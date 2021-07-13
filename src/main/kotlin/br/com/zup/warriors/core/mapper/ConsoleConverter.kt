@@ -17,6 +17,9 @@ class ConsoleConverter {
         fun consoleEntityToConsole(console: ConsoleEntity) =
             Console(console.nome, console.marca, console.dataLancamento, console.id, console.dataCadastro)
 
+        fun consoleEntityToConsoleBroker(consoleEntity: ConsoleEntity) =
+            ConsoleBroker(consoleEntity.nome, consoleEntity.marca, consoleEntity.dataLancamento, consoleEntity.id.toString())
+
     }
 
 

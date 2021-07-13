@@ -68,7 +68,7 @@ class ConsoleServerTest : AnnotationSpec() {
         eventsInformation = EventsInformationDto(
             event = "ATUALIZA_CONSOLE", consoleAtualizavel
         )
-        every { consoleService.atualizaConsole(UUID.fromString(consoleAtualizavel.id), console) } answers { console }
+        every { consoleService.atualizaConsole(UUID.fromString(consoleAtualizavel.id), console) } answers { consoleBroker }
 
         //ação
         val result = consoleServer.recive(eventsInformation)
